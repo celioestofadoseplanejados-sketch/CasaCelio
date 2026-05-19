@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CASA CELIO — CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --preto:#0a0a0a;--preto2:#141414;--preto3:#1e1e1e;
+  --dourado:#c9a84c;--dourado2:#e8c96a;--dourado3:#9a7830;
+  --dou-bg:rgba(201,168,76,.08);--dou-borda:rgba(201,168,76,.22);
+  --branco:#ffffff;--cinza1:#f8f8f6;--cinza2:#f0f0ec;--cinza3:#e0e0d8;--cinza4:#a0a099;
+  --text:#0a0a0a;--text2:#6b6b65;--text3:#9a9a93;
+  --danger:#d94f4f;--warn:#c97c2a;--ok:#3d8f5f;
+  --borda:#e8e8e2;--borda-dark:#2c2c2c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--cinza1);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* HEADER */
+header{background:var(--preto);color:var(--branco);padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;height:62px;border-bottom:1px solid var(--borda-dark);position:sticky;top:0;z-index:200}
+.logo{display:flex;align-items:center;gap:14px}
+.logo-cc{background:linear-gradient(135deg,var(--dourado),var(--dourado2));color:var(--preto);font-family:'Playfair Display',serif;font-weight:700;font-size:14px;border-radius:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-txt h1{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;letter-spacing:.6px;color:var(--branco)}
+.logo-txt p{font-size:10px;color:var(--cinza4);letter-spacing:.5px;margin-top:1px;text-transform:uppercase}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sync-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);padding:5px 12px;border-radius:20px;font-size:11px;color:var(--cinza4)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#6b6b65;flex-shrink:0;transition:background .3s}
+.sync-dot.on{background:#4ade80;animation:glow 2.2s infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.4)}50%{box-shadow:0 0 0 5px rgba(74,222,128,0)}}
+select.mes-sel{background:rgba(255,255,255,.06);color:var(--branco);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif}
+select.mes-sel option{background:var(--preto2);color:var(--branco)}
+.btn{padding:7px 16px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all .18s;font-family:'Inter',sans-serif}
+.btn-ghost{background:transparent;color:var(--cinza4);border:1px solid rgba(255,255,255,.1)}
+.btn-ghost:hover{background:rgba(255,255,255,.08);color:var(--branco)}
+.btn-gold{background:linear-gradient(135deg,var(--dourado),var(--dourado2));color:var(--preto);font-weight:600;box-shadow:0 2px 12px rgba(201,168,76,.25)}
+.btn-gold:hover{box-shadow:0 4px 20px rgba(201,168,76,.4);transform:translateY(-1px)}
+.btn-config{background:rgba(255,255,255,.06);color:var(--cinza4);border:1px solid rgba(255,255,255,.1);font-size:15px;width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:6px}
+.btn-config:hover{background:rgba(255,255,255,.12);color:var(--branco)}
+
+/* NAV */
+nav{background:var(--branco);border-bottom:1px solid var(--borda);display:flex;overflow-x:auto}
+nav::-webkit-scrollbar{height:2px}
+nav::-webkit-scrollbar-thumb{background:var(--cinza3)}
+nav button{padding:14px 20px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s;font-family:'Inter',sans-serif;letter-spacing:.2px}
+nav button.active{color:var(--dourado3);border-bottom-color:var(--dourado);font-weight:600}
+nav button:hover:not(.active){color:var(--text);background:var(--cinza1)}
+
+/* MAIN */
+.main{padding:20px;max-width:1440px;margin:0 auto}
+.section{display:none}.section.active{display:block}
+
+/* CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:20px}
+.card-stat{background:var(--branco);border-radius:10px;padding:16px 18px;border:1px solid var(--borda);position:relative;overflow:hidden;transition:box-shadow .2s}
+.card-stat:hover{box-shadow:0 4px 18px rgba(0,0,0,.07)}
+.card-stat::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--dourado),var(--dourado3))}
+.card-stat.ok::before{background:linear-gradient(180deg,#4a9e6a,#2d7a4f)}
+.card-stat.warn::before{background:linear-gradient(180deg,var(--warn),#9a5a18)}
+.card-stat .val{font-size:20px;font-weight:600;color:var(--preto);font-variant-numeric:tabular-nums;line-height:1.2}
+.card-stat .lbl{font-size:10px;color:var(--text2);margin-top:5px;text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+
+/* TABELAS */
+.table-wrap{background:var(--branco);border-radius:10px;border:1px solid var(--borda);overflow:hidden;margin-bottom:20px}
+.table-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--borda)}
+.table-header h3{font-size:13px;font-weight:600;letter-spacing:.2px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--cinza1);padding:9px 12px;text-align:left;font-weight:600;color:var(--text2);white-space:nowrap;border-bottom:1px solid var(--borda);font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+td{padding:10px 12px;border-bottom:1px solid var(--cinza2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--dou-bg)}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.2px}
+.badge-novo{background:#e8f0fe;color:#1a47a0}
+.badge-neg{background:#fff4e0;color:#a05000}
+.badge-orc{background:#f2eeff;color:#5020a0}
+.badge-fec{background:#e6f5ec;color:#1a6b3c}
+.badge-per{background:#ffeaea;color:#9a1c1c}
+.badge-q{background:#ffeaea;color:#b83030}
+.badge-m{background:#fff8e0;color:#806000}
+.badge-f{background:#e6f0ff;color:#1a3ea0}
+.btn-sm{padding:4px 10px;border-radius:5px;border:1px solid transparent;cursor:pointer;font-size:11px;font-weight:500;font-family:'Inter',sans-serif;transition:all .15s}
+.btn-edit{background:var(--dou-bg);color:var(--dourado3);border-color:var(--dou-borda)}
+.btn-edit:hover{background:rgba(201,168,76,.18)}
+.btn-del{background:#fff2f2;color:var(--danger);border-color:rgba(217,79,79,.2)}
+.btn-del:hover{background:#ffe0e0}
+
+/* FILTROS */
+.filtros{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
+.filtros select,.filtros input{padding:7px 11px;border:1px solid var(--borda);border-radius:6px;font-size:12px;background:var(--branco);color:var(--text);font-family:'Inter',sans-serif;transition:border .15s}
+.filtros select:focus,.filtros input:focus{outline:none;border-color:var(--dourado);box-shadow:0 0 0 3px rgba(201,168,76,.1)}
+.btn-limpar{background:transparent;color:var(--text2);border:1px solid var(--borda);padding:7px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif}
+.btn-limpar:hover{background:var(--cinza2)}
+
+/* MODAIS */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;backdrop-filter:blur(3px)}
+.modal-bg.open{display:flex}
+.modal{background:var(--branco);border-radius:14px;width:100%;max-width:700px;box-shadow:0 28px 80px rgba(0,0,0,.32);overflow:hidden;margin:auto}
+.modal-sm{max-width:480px}
+.modal-head{background:var(--preto);color:var(--branco);padding:16px 20px;display:flex;justify-content:space-between;align-items:flex-start}
+.modal-head-left h3{font-size:14px;font-weight:600;letter-spacing:.3px;margin-bottom:5px}
+.modal-head-line{width:32px;height:2px;background:linear-gradient(90deg,var(--dourado),var(--dourado2));border-radius:1px}
+.modal-close{background:none;border:none;color:var(--cinza4);font-size:22px;cursor:pointer;line-height:1;transition:color .15s;margin-top:-2px}
+.modal-close:hover{color:var(--branco)}
+.modal-body{padding:20px;max-height:78vh;overflow-y:auto}
+.modal-body::-webkit-scrollbar{width:4px}
+.modal-body::-webkit-scrollbar-thumb{background:var(--cinza3);border-radius:2px}
+
+/* TABS FORM */
+.tabs-form{display:flex;border-bottom:1px solid var(--borda);margin-bottom:18px}
+.tabs-form button{padding:9px 16px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;font-family:'Inter',sans-serif}
+.tabs-form button.active{color:var(--dourado3);border-bottom-color:var(--dourado);font-weight:600}
+.tab-content{display:none}.tab-content.active{display:block}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.span2{grid-column:span 2}
+label{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;padding:8px 11px;border:1px solid var(--borda);border-radius:7px;font-size:13px;font-family:'Inter',sans-serif;background:var(--branco);color:var(--text);transition:border .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--dourado);box-shadow:0 0 0 3px rgba(201,168,76,.1)}
+textarea{min-height:62px;resize:vertical}
+.sec-form-title{font-size:10px;font-weight:600;color:var(--dourado3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--dou-borda);padding-bottom:6px;grid-column:span 2;margin-top:4px}
+.parcela-row{display:grid;grid-template-columns:1fr 130px auto 32px;gap:8px;align-items:end;background:var(--cinza1);padding:10px;border-radius:8px;border:1px solid var(--borda);margin-bottom:8px}
+.resumo-fin{margin-top:14px;padding:16px;background:var(--preto);color:var(--branco);border-radius:10px}
+.resumo-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px}
+.resumo-row:not(:last-child){border-bottom:1px solid var(--borda-dark)}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--borda);display:flex;justify-content:flex-end;gap:8px;background:var(--cinza1)}
+.btn-primary{background:linear-gradient(135deg,var(--dourado),var(--dourado2));color:var(--preto);padding:9px 22px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;box-shadow:0 2px 10px rgba(201,168,76,.25);transition:all .18s}
+.btn-primary:hover{box-shadow:0 4px 18px rgba(201,168,76,.4);transform:translateY(-1px)}
+.btn-cancel{background:var(--branco);color:var(--text2);padding:9px 18px;border:1px solid var(--borda);border-radius:7px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;transition:all .15s}
+.btn-cancel:hover{background:var(--cinza2)}
+
+/* PROG BAR */
+.prog-bar{height:4px;background:var(--cinza3);border-radius:2px;overflow:hidden;margin-bottom:3px}
+.prog-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--dourado3),var(--dourado2));transition:width .4s}
+
+/* KANBAN */
+.kanban{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:20px}
+.kol{background:var(--branco);border-radius:10px;border:1px solid var(--borda);overflow:hidden}
+.kol-head{padding:11px 14px;font-size:10px;font-weight:700;display:flex;justify-content:space-between;align-items:center;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--borda);background:var(--cinza1)}
+.kol-body{padding:10px;display:flex;flex-direction:column;gap:7px;min-height:70px}
+.kcard{background:var(--branco);border:1px solid var(--borda);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s}
+.kcard:hover{border-color:var(--dourado);background:var(--dou-bg);transform:translateY(-1px);box-shadow:0 3px 12px rgba(0,0,0,.06)}
+.kcard .kname{font-weight:600;font-size:12px;margin-bottom:3px}
+.kcard .kinfo{font-size:11px;color:var(--text2)}
+.kcard .kval{font-size:11px;color:var(--dourado3);font-weight:600;margin-top:5px}
+
+/* CHARTS */
+.chart-box{background:var(--branco);border-radius:10px;border:1px solid var(--borda);padding:18px;margin-bottom:16px}
+.chart-box h4{font-size:10px;font-weight:600;margin-bottom:14px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px}
+.bar-chart{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:grid;grid-template-columns:110px 1fr 70px;gap:10px;align-items:center}
+.bar-bg{background:var(--cinza2);border-radius:3px;height:14px;overflow:hidden}
+.bar-fg{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--dourado3),var(--dourado2));transition:width .6s}
+.bar-val{font-size:12px;font-weight:600;text-align:right}
+
+/* ALERTAS */
+.alert-item{background:var(--branco);border-radius:8px;border:1px solid var(--borda);border-left:3px solid var(--warn);padding:11px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.alert-item.danger{border-left-color:var(--danger)}
+.alert-item.ok{border-left-color:var(--ok)}
+
+/* CONFIGS (equipe / produtos) */
+.config-section{margin-bottom:24px}
+.config-section h4{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--borda)}
+.config-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.config-item{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--cinza1);border:1px solid var(--borda);border-radius:8px}
+.config-item span{font-size:13px;font-weight:500}
+.config-add{display:flex;gap:8px;margin-top:4px}
+.config-add input{flex:1;padding:8px 11px;border:1px solid var(--borda);border-radius:7px;font-size:13px;font-family:'Inter',sans-serif}
+.config-add input:focus{outline:none;border-color:var(--dourado);box-shadow:0 0 0 3px rgba(201,168,76,.1)}
+.config-add button{background:linear-gradient(135deg,var(--dourado),var(--dourado2));color:var(--preto);border:none;padding:8px 16px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;white-space:nowrap}
+.config-add button:hover{box-shadow:0 2px 10px rgba(201,168,76,.3)}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--preto);color:var(--branco);border:1px solid var(--dou-borda);padding:11px 20px;border-radius:8px;font-size:13px;z-index:9999;opacity:0;transition:opacity .28s;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+#toast.show{opacity:1}
+
+/* UTILS */
+.empty-state{text-align:center;padding:40px;color:var(--text3)}
+.empty-state .ico{font-size:32px;margin-bottom:10px;opacity:.4}
+.loading{text-align:center;padding:40px;color:var(--text3)}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--cinza3);border-top-color:var(--dourado);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.section.active{animation:fadeIn .2s ease}
+
+@media(max-width:640px){
+  header{height:auto;padding:12px 16px;gap:10px}
+  .form-grid{grid-template-columns:1fr}.form-group.span2,.sec-form-title{grid-column:1}
+  .parcela-row{grid-template-columns:1fr 1fr 32px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-cc">CC</div>
+    <div class="logo-txt">
+      <h1>CASA CELIO</h1>
+      <p>CRM · Estofados · Fabricação · Reforma</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="sync-badge">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncStatus">Conectando...</span>
+    </div>
+    <select class="mes-sel" id="mesSel" onchange="filtrarMes()"></select>
+    <button class="btn btn-ghost" onclick="exportarCSV()">↓ CSV</button>
+    <button class="btn btn-config" onclick="abrirConfigs()" title="Configurações">⚙</button>
+    <button class="btn btn-gold" onclick="abrirModalNovo()">+ Novo Lead</button>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="irPara('dashboard',this)">Dashboard</button>
+  <button onclick="irPara('leads',this)">Leads</button>
+  <button onclick="irPara('kanban',this)">Kanban</button>
+  <button onclick="irPara('financeiro',this)">Financeiro</button>
+  <button onclick="irPara('recusas',this)">Recusas</button>
+  <button onclick="irPara('analise',this)">Análise</button>
+  <button onclick="irPara('alertas',this)">Alertas</button>
+</nav>
+
+<div class="main">
+
+<!-- DASHBOARD -->
+<div id="sec-dashboard" class="section active">
+  <div class="cards-grid" id="cardsResumo"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px">
+    <div class="chart-box"><h4>Orçamentos por Responsável</h4><div class="bar-chart" id="chartEquipe"></div></div>
+    <div class="chart-box"><h4>Entregas — Próximos 7 Dias</h4><div id="entregasProx"></div></div>
+  </div>
+</div>
+
+<!-- LEADS -->
+<div id="sec-leads" class="section">
+  <div class="filtros">
+    <select id="fTemp" onchange="renderLeads()"><option value="">Temperatura</option><option value="🔴">🔴 Quente</option><option value="🟡">🟡 Morno</option><option value="🔵">🔵 Frio</option></select>
+    <select id="fStatus" onchange="renderLeads()"><option value="">Status</option><option>Novo</option><option>Em negociação</option><option>Orçado</option><option>Fechado</option><option>Perdido</option></select>
+    <select id="fResp" onchange="renderLeads()"><option value="">Responsável</option></select>
+    <select id="fTipo" onchange="renderLeads()"><option value="">Tipo</option><option>Fabricação</option><option>Reforma</option></select>
+    <input type="text" id="fBusca" placeholder="Buscar cliente..." oninput="renderLeads()" style="width:180px"/>
+    <button class="btn-limpar" onclick="limparFiltros()">✕ Limpar</button>
+  </div>
+  <div class="table-wrap">
+    <div class="table-header">
+      <h3>Leads</h3>
+      <span id="countLeads" style="font-size:11px;color:var(--text2)"></span>
+    </div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Cliente</th><th>Tipo</th><th>Serviço</th><th>Temp.</th><th>Status</th>
+        <th>Orçamento</th><th>Recebido</th><th>A Receber</th><th>Responsável</th><th>Entrega</th><th>Retirada</th><th>Ações</th>
+      </tr></thead>
+      <tbody id="tbLeads"><tr><td colspan="12" class="loading"><div class="spinner"></div><br>Carregando...</td></tr></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- KANBAN -->
+<div id="sec-kanban" class="section">
+  <div class="kanban" id="kanbanBoard"></div>
+</div>
+
+<!-- FINANCEIRO -->
+<div id="sec-financeiro" class="section">
+  <div class="cards-grid" id="cardsFin"></div>
+  <div class="table-wrap">
+    <div class="table-header"><h3>Controle de Pagamentos por Cliente</h3></div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Cliente</th><th>Serviço</th><th>Responsável</th><th>Valor Total</th><th>Recebido</th><th>A Receber</th><th>Progresso</th><th>Ações</th></tr></thead>
+      <tbody id="tbFin"><tr><td colspan="8" class="loading"><div class="spinner"></div><br>Carregando...</td></tr></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- RECUSAS -->
+<div id="sec-recusas" class="section">
+  <div class="table-wrap">
+    <div class="table-header"><h3>Orçamentos Recusados — Valor Deixado de Fechar</h3></div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Cliente</th><th>Serviço</th><th>Responsável</th><th>Orçamento</th><th>Motivo</th><th>Data</th></tr></thead>
+      <tbody id="tbRecusas"></tbody>
+    </table>
+    </div>
+  </div>
+  <div class="chart-box">
+    <h4>Mensagem Sugerida — Lead sem Resposta</h4>
+    <textarea id="msgLead" style="width:100%;min-height:76px;background:var(--cinza1)" readonly>Olá [Nome]! 😊 Tudo bem? Passando para saber se você teve a oportunidade de analisar nosso orçamento. Estamos à disposição para qualquer dúvida ou ajuste. Casa Celio — 45 anos fazendo você se sentir em casa! 🛋️</textarea>
+    <button class="btn-primary" style="margin-top:10px" onclick="navigator.clipboard.writeText(document.getElementById('msgLead').value);toast('Mensagem copiada!')">Copiar mensagem</button>
+  </div>
+</div>
+
+<!-- ANÁLISE -->
+<div id="sec-analise" class="section">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+    <div class="chart-box"><h4>Funil de Vendas</h4><div id="funil"></div></div>
+    <div class="chart-box"><h4>Serviços Mais Orçados</h4><div class="bar-chart" id="chartServicos"></div></div>
+    <div class="chart-box"><h4>Ranking Equipe — Fechamentos</h4><div class="bar-chart" id="chartRanking"></div></div>
+    <div class="chart-box"><h4>Ticket Médio por Tipo</h4><div id="ticketMedio"></div></div>
+  </div>
+</div>
+
+<!-- ALERTAS -->
+<div id="sec-alertas" class="section">
+  <div style="margin-bottom:16px;display:flex;align-items:center;gap:10px">
+    <h3 style="font-size:14px;font-weight:600">Central de Alertas</h3>
+    <span id="alertCount" style="background:var(--dou-bg);color:var(--dourado3);font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;border:1px solid var(--dou-borda)"></span>
+  </div>
+  <div id="alertasList"></div>
+</div>
+
+</div><!-- /main -->
+
+<!-- ══════════════════════════════════════════
+     MODAL LEAD
+═══════════════════════════════════════════ -->
+<div class="modal-bg" id="modalBg">
+<div class="modal">
+  <div class="modal-head">
+    <div class="modal-head-left">
+      <h3 id="modalTitulo">Novo Lead</h3>
+      <div class="modal-head-line"></div>
+    </div>
+    <button class="modal-close" onclick="fecharModal()">×</button>
+  </div>
+  <div class="modal-body">
+    <div class="tabs-form">
+      <button class="active" onclick="irTab(0,this)">Dados Gerais</button>
+      <button onclick="irTab(1,this)">Negociação</button>
+      <button onclick="irTab(2,this)">Logística</button>
+      <button onclick="irTab(3,this)">Pagamento</button>
+    </div>
+
+    <!-- TAB 0 -->
+    <div class="tab-content active" id="tab0">
+      <div class="form-grid">
+        <div class="form-group span2"><label>Nome do Cliente *</label><input type="text" id="fNome" placeholder="Nome completo"/></div>
+        <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="fTel" placeholder="(11) 99999-9999"/></div>
+        <div class="form-group"><label>Responsável</label><select id="fRespF"></select></div>
+        <div class="form-group"><label>Tipo de Serviço *</label>
+          <select id="fTipoS"><option value="">Selecione…</option><option>Fabricação</option><option>Reforma</option></select></div>
+        <div class="form-group"><label>Produto / Serviço *</label><select id="fProd"><option value="">Selecione…</option></select></div>
+        <div class="form-group"><label>Mês de Referência</label><select id="fMesRef"></select></div>
+        <div class="form-group"><label>Data de Entrada</label><input type="date" id="fDataEnt"/></div>
+        <div class="form-group"><label>Data de Fechamento</label><input type="date" id="fDataFech"/></div>
+        <div class="form-group"><label>Lembrete — Contato em</label><input type="date" id="fLembrete"/></div>
+        <div class="form-group span2"><label>Obs. Lembrete</label><textarea id="fObsLemb" placeholder="Detalhe do lembrete..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- TAB 1 -->
+    <div class="tab-content" id="tab1">
+      <div class="form-grid">
+        <div class="form-group"><label>Temperatura</label>
+          <select id="fTemp2"><option value="🔵">🔵 Frio — Interesse inicial</option><option value="🟡">🟡 Morno — Consultando</option><option value="🔴">🔴 Quente — Pronto para fechar</option></select></div>
+        <div class="form-group"><label>Status</label>
+          <select id="fStatusF"><option>Novo</option><option>Em negociação</option><option>Orçado</option><option>Fechado</option><option>Perdido</option></select></div>
+        <div class="form-group"><label>Valor do Orçamento (R$)</label><input type="number" id="fValOrc" placeholder="0,00" min="0" step="0.01"/></div>
+        <div class="form-group"><label>Tecido Escolhido</label><input type="text" id="fTecido" placeholder="Suede, Linho..."/></div>
+        <div class="form-group"><label>Cor Escolhida</label><input type="text" id="fCor" placeholder="Bege, Cinza..."/></div>
+        <div class="form-group"><label>Motivo da Recusa</label><input type="text" id="fMotivo" placeholder="Se perdido..."/></div>
+        <div class="form-group span2"><label>Detalhe da Negociação</label><textarea id="fDetalhe" placeholder="Observações gerais..."></textarea></div>
+        <div class="form-group span2"><label>Serviço Fechado</label><textarea id="fServFech" placeholder="Descreva o que foi contratado..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- TAB 2 -->
+    <div class="tab-content" id="tab2">
+      <div class="form-grid">
+        <div class="form-group"><label>Entrega Prevista</label><input type="date" id="fEntregaPrev"/></div>
+        <div class="form-group"><label>Entrega Real</label><input type="date" id="fEntregaReal"/></div>
+        <div class="sec-form-title" style="margin-top:8px">Retirada — Somente Reforma</div>
+        <div class="form-group"><label>Retirada Agendada</label><input type="date" id="fRetAgend"/></div>
+        <div class="form-group"><label>Confirmação</label>
+          <select id="fRetConf"><option value="Pendente">Pendente</option><option value="Realizada">✅ Retirada Realizada</option></select></div>
+        <div class="form-group"><label>Data da Retirada</label><input type="date" id="fRetData"/></div>
+        <div class="form-group span2"><label>Obs. Retirada</label><textarea id="fRetObs" placeholder="Observações sobre a retirada..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- TAB 3 -->
+    <div class="tab-content" id="tab3">
+      <p style="font-size:10px;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Parcelas de Pagamento</p>
+      <div id="parcelasWrap"></div>
+      <button onclick="addParcela()" style="background:var(--dou-bg);color:var(--dourado3);border:1px solid var(--dou-borda);padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;font-weight:500;margin-bottom:14px">
+        + Adicionar Parcela
+      </button>
+      <div class="resumo-fin">
+        <div class="resumo-row"><span style="color:var(--cinza4);font-size:12px">Total Orçado</span><strong id="resOrc">R$ 0,00</strong></div>
+        <div class="resumo-row"><span style="color:var(--cinza4);font-size:12px">Total Recebido</span><strong id="resRec" style="color:var(--dourado2)">R$ 0,00</strong></div>
+        <div class="resumo-row"><span style="color:var(--cinza4);font-size:12px">A Receber</span><strong id="resARec" style="color:var(--warn)">R$ 0,00</strong></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+    <button class="btn-primary" onclick="salvarLead()">Salvar Lead</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL CONFIGURAÇÕES (Equipe + Produtos)
+═══════════════════════════════════════════ -->
+<div class="modal-bg" id="modalConfigBg">
+<div class="modal modal-sm">
+  <div class="modal-head">
+    <div class="modal-head-left">
+      <h3>Configurações</h3>
+      <div class="modal-head-line"></div>
+    </div>
+    <button class="modal-close" onclick="fecharConfigs()">×</button>
+  </div>
+  <div class="modal-body">
+
+    <!-- EQUIPE -->
+    <div class="config-section">
+      <h4>👥 Equipe — Responsáveis</h4>
+      <div class="config-list" id="listaEquipe"></div>
+      <div class="config-add">
+        <input type="text" id="novoMembro" placeholder="Nome do novo membro..." maxlength="40"/>
+        <button onclick="adicionarMembro()">+ Adicionar</button>
+      </div>
+      <p style="font-size:11px;color:var(--text3);margin-top:8px">Membros com leads vinculados não podem ser removidos.</p>
+    </div>
+
+    <!-- PRODUTOS -->
+    <div class="config-section">
+      <h4>🛋 Produtos / Serviços</h4>
+      <div class="config-list" id="listaProdutos"></div>
+      <div class="config-add">
+        <input type="text" id="novoProduto" placeholder="Nome do novo produto..." maxlength="60"/>
+        <button onclick="adicionarProduto()">+ Adicionar</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-foot">
+    <button class="btn-primary" onclick="fecharConfigs()">Fechar</button>
+  </div>
+</div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     FIREBASE + LÓGICA
+═══════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, doc,
+  onSnapshot, addDoc, updateDoc, deleteDoc, setDoc,
+  serverTimestamp, query, orderBy, getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCaSZ6yYf06STzuhEOoQxlwmyxlECE1Cds",
+  authDomain: "crm-casa-celio.firebaseapp.com",
+  projectId: "crm-casa-celio",
+  storageBucket: "crm-casa-celio.firebasestorage.app",
+  messagingSenderId: "612746157241",
+  appId: "1:612746157241:web:364a46234e8bf69011cf68",
+  measurementId: "G-GSZWLMRGB0"
+};
+
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const leadsCol = collection(db, "leads");
+const configDoc = doc(db, "config", "crm");
+
+// ── Estado ────────────────────────────────────────────────
+let LEADS    = [];
+let EQUIPE   = ["Aline","Márcio","Eudes","Jéssica"];
+let PRODUTOS = ["Sofá","Poltrona","Cama Box","Cabeceira","Puff","Cadeira","Mesa de Jantar","Bistrô","Banqueta","Reforma de Sofá","Reforma de Poltrona","Reforma de Cadeira","Reforma de Cabeceira"];
+let editId   = null;
+let parcelasCount = 0;
+let mesFiltro = "";
+
+// ── Meses ─────────────────────────────────────────────────
+const MN = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const MESES = [];
+for(let y=2025;y<=2027;y++) for(let m=0;m<12;m++) MESES.push(`${MN[m]} ${y}`);
+const hoje = new Date();
+const mesAtual = `${MN[hoje.getMonth()]} ${hoje.getFullYear()}`;
+
+function popularMeses(){
+  const sel = document.getElementById("mesSel");
+  sel.innerHTML = `<option value="">Todos os meses</option>`;
+  MESES.forEach(m=>{
+    const o = document.createElement("option");
+    o.value = m; o.textContent = m + (m===mesAtual?" ·":"");
+    if(m===mesAtual) o.selected = true;
+    sel.appendChild(o);
+  });
+  mesFiltro = mesAtual;
+  document.getElementById("fMesRef").innerHTML = MESES.map(m=>`<option${m===mesAtual?" selected":""}>${m}</option>`).join("");
+}
+popularMeses();
+
+// ── Preenche selects dinâmicos ─────────────────────────────
+function popularSelectEquipe(){
+  const sels = ["fRespF","fResp"];
+  sels.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    const val = el.value;
+    el.innerHTML = (id==="fResp"?`<option value="">Responsável</option>`:"")+
+      EQUIPE.map(e=>`<option value="${e}">${e}</option>`).join("");
+    if(val) el.value = val;
+  });
+}
+function popularSelectProdutos(){
+  const el = document.getElementById("fProd");
+  if(!el) return;
+  const val = el.value;
+  el.innerHTML = `<option value="">Selecione…</option>` + PRODUTOS.map(p=>`<option value="${p}">${p}</option>`).join("");
+  if(val) el.value = val;
+}
+
+// ── Firebase: config (equipe + produtos) ──────────────────
+onSnapshot(configDoc, snap=>{
+  if(snap.exists()){
+    const d = snap.data();
+    if(d.equipe && d.equipe.length)   EQUIPE   = d.equipe;
+    if(d.produtos && d.produtos.length) PRODUTOS = d.produtos;
+  }
+  popularSelectEquipe();
+  popularSelectProdutos();
+  renderListaEquipe();
+  renderListaProdutos();
+  renderAll(); // re-render análise com equipe atualizada
+});
+
+async function salvarConfig(){
+  await setDoc(configDoc, { equipe: EQUIPE, produtos: PRODUTOS }, { merge: true });
+}
+
+// ── Firebase: leads (tempo real) ──────────────────────────
+const q = query(leadsCol, orderBy("criadoEm","desc"));
+onSnapshot(q, snap=>{
+  LEADS = snap.docs.map(d=>({id:d.id,...d.data()}));
+  const dot = document.getElementById("syncDot");
+  dot.style.background = "#4ade80"; dot.classList.add("on");
+  document.getElementById("syncStatus").textContent = "Sincronizado";
+  renderAll();
+}, ()=>{
+  const dot = document.getElementById("syncDot");
+  dot.style.background = "#f87171"; dot.classList.remove("on");
+  document.getElementById("syncStatus").textContent = "Sem conexão";
+});
+
+// ── Filtro de mês ─────────────────────────────────────────
+window.filtrarMes = ()=>{ mesFiltro = document.getElementById("mesSel").value; renderAll(); };
+const getFilt = ()=> LEADS.filter(l=>!mesFiltro || l.mesRef===mesFiltro);
+
+function renderAll(){
+  renderDashboard(); renderLeads(); renderKanban();
+  renderFinanceiro(); renderRecusas(); renderAnalise(); renderAlertas();
+}
+
+// ── Utils ─────────────────────────────────────────────────
+const fmt  = v => "R$ "+(parseFloat(v)||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtD = s => { if(!s) return "—"; const[y,m,d]=s.split("-"); return `${d}/${m}/${y}`; };
+const diasAte = s => { if(!s) return 9999; return Math.round((new Date(s+"T12:00:00")-new Date())/864e5); };
+function bStatus(s){ const m={Novo:"badge-novo","Em negociação":"badge-neg",Orçado:"badge-orc",Fechado:"badge-fec",Perdido:"badge-per"}; return `<span class="badge ${m[s]||''}">${s}</span>`; }
+function bTemp(t)  { const m={"🔴":"badge-q","🟡":"badge-m","🔵":"badge-f"}; return `<span class="badge ${m[t]||''}">${t}</span>`; }
+const totRec = l => (l.parcelas||[]).filter(p=>p.pago).reduce((s,p)=>s+(parseFloat(p.valor)||0),0);
+const aRec   = l => Math.max(0,(parseFloat(l.valOrc)||0)-totRec(l));
+
+// ── DASHBOARD ─────────────────────────────────────────────
+function renderDashboard(){
+  const ls  = getFilt();
+  const fec = ls.filter(l=>l.status==="Fechado");
+  document.getElementById("cardsResumo").innerHTML = `
+    <div class="card-stat"><div class="val">${ls.length}</div><div class="lbl">Total de Leads</div></div>
+    <div class="card-stat"><div class="val">${fec.length}</div><div class="lbl">Fechados</div></div>
+    <div class="card-stat"><div class="val">${fmt(ls.reduce((s,l)=>s+(parseFloat(l.valOrc)||0),0))}</div><div class="lbl">Total Orçado</div></div>
+    <div class="card-stat"><div class="val">${fmt(fec.reduce((s,l)=>s+(parseFloat(l.valOrc)||0),0))}</div><div class="lbl">Total Fechado</div></div>
+    <div class="card-stat ok"><div class="val" style="color:var(--ok)">${fmt(ls.reduce((s,l)=>s+totRec(l),0))}</div><div class="lbl">Recebido</div></div>
+    <div class="card-stat warn"><div class="val" style="color:var(--warn)">${fmt(ls.reduce((s,l)=>s+aRec(l),0))}</div><div class="lbl">A Receber</div></div>`;
+
+  const maxO = Math.max(...EQUIPE.map(r=>ls.filter(l=>l.resp===r).reduce((s,l)=>s+(parseFloat(l.valOrc)||0),0)),1);
+  document.getElementById("chartEquipe").innerHTML = EQUIPE.map(r=>{
+    const orc = ls.filter(l=>l.resp===r).reduce((s,l)=>s+(parseFloat(l.valOrc)||0),0);
+    const fn  = ls.filter(l=>l.resp===r&&l.status==="Fechado").length;
+    return `<div class="bar-row">
+      <span style="font-size:12px">${r}</span>
+      <div class="bar-bg"><div class="bar-fg" style="width:${Math.round(orc/maxO*100)}%"></div></div>
+      <span class="bar-val">${fn} fech.</span></div>`;
+  }).join("");
+
+  const prox = LEADS.filter(l=>{ const d=diasAte(l.entregaPrev); return d>=0&&d<=7; }).sort((a,b)=>diasAte(a.entregaPrev)-diasAte(b.entregaPrev));
+  document.getElementById("entregasProx").innerHTML = prox.length
+    ? prox.map(l=>`<div style="padding:9px 0;border-bottom:1px solid var(--borda);font-size:12px">
+        <strong>${l.nome}</strong> <span style="color:var(--text2)">— ${l.prod||"—"}</span><br>
+        <span style="color:${diasAte(l.entregaPrev)<=2?"var(--danger)":"var(--dourado3)"}">
+          ${fmtD(l.entregaPrev)} · ${diasAte(l.entregaPrev)===0?"Hoje":`${diasAte(l.entregaPrev)} dia${diasAte(l.entregaPrev)===1?"":"s"}`}
+        </span> · <span style="color:var(--text2)">${l.resp||"—"}</span></div>`).join("")
+    : `<div class="empty-state"><div class="ico">✓</div>Nenhuma entrega nos próximos 7 dias</div>`;
+}
+
+// ── LEADS ─────────────────────────────────────────────────
+window.renderLeads = function(){
+  const temp   = document.getElementById("fTemp").value;
+  const status = document.getElementById("fStatus").value;
+  const resp   = document.getElementById("fResp").value;
+  const tipo   = document.getElementById("fTipo").value;
+  const busca  = document.getElementById("fBusca").value.toLowerCase();
+  const ls = getFilt().filter(l=>
+    (!temp   || l.temp===temp)&&
+    (!status || l.status===status)&&
+    (!resp   || l.resp===resp)&&
+    (!tipo   || l.tipo===tipo)&&
+    (!busca  || (l.nome||"").toLowerCase().includes(busca)||(l.tel||"").includes(busca))
+  );
+  document.getElementById("countLeads").textContent = `${ls.length} lead${ls.length===1?"":"s"}`;
+  document.getElementById("tbLeads").innerHTML = ls.length
+    ? ls.map(l=>`<tr>
+        <td><strong>${l.nome||"—"}</strong><br><span style="font-size:11px;color:var(--text2)">${l.tel||""}</span></td>
+        <td>${l.tipo||"—"}</td><td>${l.prod||"—"}</td>
+        <td>${bTemp(l.temp||"🔵")}</td><td>${bStatus(l.status||"Novo")}</td>
+        <td style="font-weight:500">${fmt(l.valOrc)}</td>
+        <td style="color:var(--ok)">${fmt(totRec(l))}</td>
+        <td style="color:var(--warn)">${fmt(aRec(l))}</td>
+        <td>${l.resp||"—"}</td><td>${fmtD(l.entregaPrev)}</td>
+        <td>${l.tipo==="Reforma"?(l.retConf==="Realizada"?"✅":fmtD(l.retAgend)):"—"}</td>
+        <td style="display:flex;gap:4px;white-space:nowrap">
+          <button class="btn-sm btn-edit" onclick="editarLead('${l.id}')">Editar</button>
+          <button class="btn-sm btn-del"  onclick="excluirLead('${l.id}')">✕</button>
+        </td></tr>`).join("")
+    : `<tr><td colspan="12" class="empty-state"><div class="ico">○</div>Nenhum lead encontrado</td></tr>`;
+};
+window.limparFiltros = ()=>{ ["fTemp","fStatus","fResp","fTipo"].forEach(id=>document.getElementById(id).value=""); document.getElementById("fBusca").value=""; renderLeads(); };
+
+// ── KANBAN ─────────────────────────────────────────────────
+function renderKanban(){
+  const cols   = ["Novo","Em negociação","Orçado","Fechado","Perdido"];
+  const colors = {Novo:"#1a47a0","Em negociação":"#a05000",Orçado:"#5020a0",Fechado:"#1a6b3c",Perdido:"#9a1c1c"};
+  const ls = getFilt();
+  document.getElementById("kanbanBoard").innerHTML = cols.map(col=>{
+    const its = ls.filter(l=>l.status===col);
+    return `<div class="kol">
+      <div class="kol-head" style="color:${colors[col]}">${col}
+        <span style="background:${colors[col]};color:#fff;border-radius:20px;padding:2px 9px;font-size:10px">${its.length}</span>
+      </div>
+      <div class="kol-body">
+        ${its.length?its.map(l=>`<div class="kcard" onclick="editarLead('${l.id}')">
+          <div class="kname">${l.nome||"—"}</div>
+          <div class="kinfo">${l.prod||"—"} · ${l.resp||"—"}</div>
+          <div class="kval">${fmt(l.valOrc)} ${l.temp||""}</div>
+        </div>`).join(""):`<div style="color:var(--text3);font-size:11px;text-align:center;padding:14px">Vazio</div>`}
+      </div></div>`;
+  }).join("");
+}
+
+// ── FINANCEIRO ─────────────────────────────────────────────
+function renderFinanceiro(){
+  const ls = LEADS;
+  document.getElementById("cardsFin").innerHTML = `
+    <div class="card-stat"><div class="val">${fmt(ls.reduce((s,l)=>s+(parseFloat(l.valOrc)||0),0))}</div><div class="lbl">Total Orçado (Geral)</div></div>
+    <div class="card-stat ok"><div class="val" style="color:var(--ok)">${fmt(ls.reduce((s,l)=>s+totRec(l),0))}</div><div class="lbl">Total Recebido</div></div>
+    <div class="card-stat warn"><div class="val" style="color:var(--warn)">${fmt(ls.reduce((s,l)=>s+aRec(l),0))}</div><div class="lbl">Total a Receber</div></div>`;
+  document.getElementById("tbFin").innerHTML = ls.length
+    ? ls.map(l=>{
+        const r=totRec(l),a=aRec(l),t=parseFloat(l.valOrc)||0,p=t>0?Math.round(r/t*100):0;
+        return `<tr><td><strong>${l.nome||"—"}</strong></td><td>${l.prod||"—"}</td><td>${l.resp||"—"}</td>
+          <td style="font-weight:500">${fmt(t)}</td>
+          <td style="color:var(--ok)">${fmt(r)}</td>
+          <td style="color:var(--warn)">${fmt(a)}</td>
+          <td style="min-width:100px"><div class="prog-bar"><div class="prog-fill" style="width:${p}%"></div></div>
+            <span style="font-size:10px;color:var(--text2)">${p}%</span></td>
+          <td><button class="btn-sm btn-edit" onclick="editarLead('${l.id}')">Parcelas</button></td></tr>`;
+      }).join("")
+    : `<tr><td colspan="8" class="empty-state">Sem dados financeiros</td></tr>`;
+}
+
+// ── RECUSAS ────────────────────────────────────────────────
+function renderRecusas(){
+  const ls  = LEADS.filter(l=>l.status==="Perdido");
+  const tot = ls.reduce((s,l)=>s+(parseFloat(l.valOrc)||0),0);
+  document.getElementById("tbRecusas").innerHTML = ls.length
+    ? ls.map(l=>`<tr><td><strong>${l.nome||"—"}</strong></td><td>${l.prod||"—"}</td><td>${l.resp||"—"}</td>
+        <td style="color:var(--danger);font-weight:500">${fmt(l.valOrc)}</td>
+        <td>${l.motivo||"—"}</td><td>${fmtD(l.dataEnt)}</td></tr>`).join("")+
+      `<tr style="background:var(--cinza1)"><td colspan="3" style="font-weight:600">Total deixado de fechar</td>
+       <td style="color:var(--danger);font-weight:700">${fmt(tot)}</td><td colspan="2"></td></tr>`
+    : `<tr><td colspan="6" class="empty-state">Nenhuma recusa registrada</td></tr>`;
+}
+
+// ── ANÁLISE ────────────────────────────────────────────────
+function renderAnalise(){
+  const ls = LEADS;
+  const etapas = ["Novo","Em negociação","Orçado","Fechado","Perdido"];
+  const maxE = Math.max(...etapas.map(e=>ls.filter(l=>l.status===e).length),1);
+  document.getElementById("funil").innerHTML = `<div class="bar-chart">`+etapas.map(e=>{
+    const n = ls.filter(l=>l.status===e).length;
+    return `<div class="bar-row"><span style="font-size:12px">${e}</span>
+      <div class="bar-bg"><div class="bar-fg" style="width:${Math.round(n/maxE*100)}%"></div></div>
+      <span class="bar-val">${n}</span></div>`;
+  }).join("")+`</div>`;
+
+  const sm={};ls.forEach(l=>{ if(l.prod) sm[l.prod]=(sm[l.prod]||0)+1; });
+  const servs = Object.entries(sm).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const maxS  = Math.max(...servs.map(s=>s[1]),1);
+  document.getElementById("chartServicos").innerHTML = servs.map(([k,v])=>`
+    <div class="bar-row"><span style="font-size:11px">${k}</span>
+      <div class="bar-bg"><div class="bar-fg" style="width:${Math.round(v/maxS*100)}%"></div></div>
+      <span class="bar-val">${v}</span></div>`).join("");
+
+  const ranks = EQUIPE.map(r=>({r,n:ls.filter(l=>l.status==="Fechado"&&l.resp===r).length})).sort((a,b)=>b.n-a.n);
+  const maxR  = Math.max(...ranks.map(r=>r.n),1);
+  document.getElementById("chartRanking").innerHTML = ranks.map(({r,n},i)=>`
+    <div class="bar-row"><span style="font-size:12px">${["🥇","🥈","🥉",""][i]||""} ${r}</span>
+      <div class="bar-bg"><div class="bar-fg" style="width:${Math.round(n/maxR*100)}%"></div></div>
+      <span class="bar-val">${n}</span></div>`).join("");
+
+  document.getElementById("ticketMedio").innerHTML = ["Fabricação","Reforma"].map(t=>{
+    const lsT = ls.filter(l=>l.tipo===t&&(parseFloat(l.valOrc)||0)>0);
+    const avg = lsT.length ? lsT.reduce((s,l)=>s+(parseFloat(l.valOrc)||0),0)/lsT.length : 0;
+    return `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--borda)">
+      <span style="color:var(--text2)">${t}</span><strong>${fmt(avg)}</strong></div>`;
+  }).join("");
+}
+
+// ── ALERTAS ────────────────────────────────────────────────
+function renderAlertas(){
+  const alertas=[];
+  LEADS.forEach(l=>{
+    if(l.lembrete){ const d=diasAte(l.lembrete); if(d>=0&&d<=3) alertas.push({tipo:d===0?"danger":"warn",msg:`Lembrete: <strong>${l.nome}</strong> — ${l.obsLemb||"Entrar em contato"} (${d===0?"Hoje":`${d} dia${d===1?"":"s"}`})`}); }
+    if(l.entregaPrev){ const d=diasAte(l.entregaPrev); if(d>=0&&d<=5) alertas.push({tipo:d<=1?"danger":"warn",msg:`Entrega próxima: <strong>${l.nome}</strong> em ${d===0?"hoje":`${d} dia${d===1?"":"s"}`} — ${fmtD(l.entregaPrev)}`}); }
+    if(l.status==="Orçado"&&diasAte(l.dataEnt)<=-7) alertas.push({tipo:"warn",msg:`Orçamento sem resposta há +7 dias: <strong>${l.nome}</strong>`});
+    if((parseFloat(l.valOrc)||0)>0&&aRec(l)>0&&l.status==="Fechado") alertas.push({tipo:"ok",msg:`Pagamento pendente: <strong>${l.nome}</strong> — ${fmt(aRec(l))} a receber`});
+  });
+  document.getElementById("alertCount").textContent = `${alertas.length} alerta${alertas.length===1?"":"s"}`;
+  document.getElementById("alertasList").innerHTML = alertas.length
+    ? alertas.map(a=>`<div class="alert-item ${a.tipo}"><span style="font-size:13px">${a.msg}</span></div>`).join("")
+    : `<div class="empty-state"><div class="ico">✓</div>Nenhum alerta no momento</div>`;
+}
+
+// ── NAVEGAÇÃO ──────────────────────────────────────────────
+window.irPara = (sec, btn) => {
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("sec-"+sec).classList.add("active"); btn.classList.add("active");
+};
+
+// ══════════════════════════════════════════════════
+// MODAL CONFIGURAÇÕES — Equipe & Produtos
+// ══════════════════════════════════════════════════
+window.abrirConfigs = () => {
+  renderListaEquipe(); renderListaProdutos();
+  document.getElementById("modalConfigBg").classList.add("open");
+};
+window.fecharConfigs = () => document.getElementById("modalConfigBg").classList.remove("open");
+
+function renderListaEquipe(){
+  const usados = new Set(LEADS.map(l=>l.resp).filter(Boolean));
+  document.getElementById("listaEquipe").innerHTML = EQUIPE.map(m=>`
+    <div class="config-item">
+      <span>${m}</span>
+      <button class="btn-sm btn-del" onclick="removerMembro('${m}')"
+        ${usados.has(m)?`disabled title="Tem leads vinculados" style="opacity:.4;cursor:not-allowed"`:""}>Remover</button>
+    </div>`).join("") || `<p style="font-size:12px;color:var(--text3)">Nenhum membro cadastrado.</p>`;
+}
+
+function renderListaProdutos(){
+  document.getElementById("listaProdutos").innerHTML = PRODUTOS.map(p=>`
+    <div class="config-item">
+      <span>${p}</span>
+      <button class="btn-sm btn-del" onclick="removerProduto('${p.replace(/'/g,"\\'")}')">Remover</button>
+    </div>`).join("") || `<p style="font-size:12px;color:var(--text3)">Nenhum produto cadastrado.</p>`;
+}
+
+window.adicionarMembro = async () => {
+  const inp = document.getElementById("novoMembro");
+  const nome = inp.value.trim();
+  if(!nome) return;
+  if(EQUIPE.map(e=>e.toLowerCase()).includes(nome.toLowerCase())){ toast("Membro já existe!"); return; }
+  EQUIPE = [...EQUIPE, nome];
+  inp.value = "";
+  await salvarConfig();
+  popularSelectEquipe();
+  renderListaEquipe();
+  toast(`${nome} adicionado à equipe!`);
+};
+
+window.removerMembro = async nome => {
+  const usados = new Set(LEADS.map(l=>l.resp).filter(Boolean));
+  if(usados.has(nome)){ toast("Não é possível remover: possui leads vinculados."); return; }
+  if(!confirm(`Remover ${nome} da equipe?`)) return;
+  EQUIPE = EQUIPE.filter(e=>e!==nome);
+  await salvarConfig();
+  popularSelectEquipe();
+  renderListaEquipe();
+  toast(`${nome} removido da equipe.`);
+};
+
+window.adicionarProduto = async () => {
+  const inp = document.getElementById("novoProduto");
+  const nome = inp.value.trim();
+  if(!nome) return;
+  if(PRODUTOS.map(p=>p.toLowerCase()).includes(nome.toLowerCase())){ toast("Produto já existe!"); return; }
+  PRODUTOS = [...PRODUTOS, nome];
+  inp.value = "";
+  await salvarConfig();
+  popularSelectProdutos();
+  renderListaProdutos();
+  toast(`"${nome}" adicionado aos produtos!`);
+};
+
+window.removerProduto = async nome => {
+  if(!confirm(`Remover "${nome}" dos produtos?`)) return;
+  PRODUTOS = PRODUTOS.filter(p=>p!==nome);
+  await salvarConfig();
+  popularSelectProdutos();
+  renderListaProdutos();
+  toast(`"${nome}" removido.`);
+};
+
+// ══════════════════════════════════════════════════
+// MODAL LEAD
+// ══════════════════════════════════════════════════
+window.abrirModalNovo = () => {
+  editId = null;
+  document.getElementById("modalTitulo").textContent = "Novo Lead";
+  limparForm();
+  document.getElementById("modalBg").classList.add("open");
+  irTab(0, document.querySelector(".tabs-form button"));
+};
+window.fecharModal = () => document.getElementById("modalBg").classList.remove("open");
+
+window.irTab = (i, btn) => {
+  document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".tabs-form button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("tab"+i).classList.add("active"); btn.classList.add("active");
+  if(i===3) atualizarResumo();
+};
+
+function limparForm(){
+  ["fNome","fTel","fTecido","fCor","fMotivo","fDetalhe","fServFech","fObsLemb","fRetObs"].forEach(id=>document.getElementById(id).value="");
+  ["fDataEnt","fDataFech","fLembrete","fEntregaPrev","fEntregaReal","fRetAgend","fRetData","fValOrc"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("fTipoS").value=""; document.getElementById("fProd").value="";
+  document.getElementById("fRespF").value = EQUIPE[0]||"";
+  document.getElementById("fTemp2").value="🔵"; document.getElementById("fStatusF").value="Novo";
+  document.getElementById("fRetConf").value="Pendente";
+  document.getElementById("fMesRef").value = mesAtual;
+  document.getElementById("fDataEnt").value = new Date().toISOString().split("T")[0];
+  parcelasCount = 0; document.getElementById("parcelasWrap").innerHTML=""; atualizarResumo();
+}
+
+window.addParcela = () => {
+  parcelasCount++;
+  const div = document.createElement("div"); div.className="parcela-row"; div.id="parc"+parcelasCount;
+  div.innerHTML = `
+    <div class="form-group"><label>Descrição</label><input type="text" id="pd${parcelasCount}" placeholder="Entrada, Parcela 1..."/></div>
+    <div class="form-group"><label>Valor (R$)</label><input type="number" id="pv${parcelasCount}" min="0" step="0.01" oninput="atualizarResumo()"/></div>
+    <div class="form-group"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="pp${parcelasCount}" onchange="atualizarResumo()"/> Pago</label></div>
+    <button class="btn-sm btn-del" style="margin-top:18px;height:32px" onclick="document.getElementById('parc${parcelasCount}').remove();atualizarResumo()">✕</button>`;
+  document.getElementById("parcelasWrap").appendChild(div);
+};
+
+function atualizarResumo(){
+  const orc = parseFloat(document.getElementById("fValOrc").value)||0; let rec=0;
+  document.querySelectorAll("[id^='pv']").forEach(inp=>{
+    const n = inp.id.replace("pv",""); const chk = document.getElementById("pp"+n);
+    if(chk&&chk.checked) rec += parseFloat(inp.value)||0;
+  });
+  document.getElementById("resOrc").textContent  = fmt(orc);
+  document.getElementById("resRec").textContent  = fmt(rec);
+  document.getElementById("resARec").textContent = fmt(Math.max(0,orc-rec));
+}
+window.atualizarResumo = atualizarResumo;
+document.getElementById("fValOrc").addEventListener("input", atualizarResumo);
+
+function coletarParcelas(){
+  const p=[];
+  document.querySelectorAll("[id^='pd']").forEach(inp=>{
+    const n=inp.id.replace("pd",""); const pv=document.getElementById("pv"+n),pp=document.getElementById("pp"+n);
+    if(pv) p.push({desc:inp.value||"",valor:parseFloat(pv.value)||0,pago:pp?pp.checked:false});
+  });
+  return p;
+}
+
+function preencherForm(l){
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.value=v||""; };
+  set("fNome",l.nome); set("fTel",l.tel); set("fTipoS",l.tipo); set("fProd",l.prod);
+  set("fRespF",l.resp||EQUIPE[0]||""); set("fMesRef",l.mesRef||mesAtual);
+  set("fDataEnt",l.dataEnt); set("fDataFech",l.dataFech); set("fLembrete",l.lembrete); set("fObsLemb",l.obsLemb);
+  set("fTemp2",l.temp||"🔵"); set("fStatusF",l.status||"Novo"); set("fValOrc",l.valOrc||"");
+  set("fTecido",l.tecido); set("fCor",l.cor); set("fMotivo",l.motivo);
+  set("fDetalhe",l.detalhe); set("fServFech",l.servFech);
+  set("fEntregaPrev",l.entregaPrev); set("fEntregaReal",l.entregaReal);
+  set("fRetAgend",l.retAgend); set("fRetConf",l.retConf||"Pendente");
+  set("fRetData",l.retData); set("fRetObs",l.retObs);
+  parcelasCount=0; document.getElementById("parcelasWrap").innerHTML="";
+  (l.parcelas||[]).forEach(p=>{
+    addParcela();
+    document.getElementById("pd"+parcelasCount).value = p.desc||"";
+    document.getElementById("pv"+parcelasCount).value = p.valor||"";
+    document.getElementById("pp"+parcelasCount).checked = p.pago||false;
+  });
+  atualizarResumo();
+}
+
+window.editarLead = id => {
+  const l = LEADS.find(x=>x.id===id); if(!l) return;
+  editId = id;
+  document.getElementById("modalTitulo").textContent = "Editar Lead";
+  preencherForm(l);
+  document.getElementById("modalBg").classList.add("open");
+  irTab(0, document.querySelector(".tabs-form button"));
+};
+
+window.excluirLead = async id => {
+  if(!confirm("Excluir este lead? Ação irreversível.")) return;
+  await deleteDoc(doc(db,"leads",id)); toast("Lead excluído.");
+};
+
+window.salvarLead = async () => {
+  const nome = document.getElementById("fNome").value.trim();
+  if(!nome){ alert("Informe o nome do cliente."); irTab(0,document.querySelector(".tabs-form button")); return; }
+  const dados = {
+    nome, tel:document.getElementById("fTel").value,
+    tipo:document.getElementById("fTipoS").value, prod:document.getElementById("fProd").value,
+    resp:document.getElementById("fRespF").value, mesRef:document.getElementById("fMesRef").value,
+    dataEnt:document.getElementById("fDataEnt").value, dataFech:document.getElementById("fDataFech").value,
+    lembrete:document.getElementById("fLembrete").value, obsLemb:document.getElementById("fObsLemb").value,
+    temp:document.getElementById("fTemp2").value, status:document.getElementById("fStatusF").value,
+    valOrc:parseFloat(document.getElementById("fValOrc").value)||0,
+    tecido:document.getElementById("fTecido").value, cor:document.getElementById("fCor").value,
+    motivo:document.getElementById("fMotivo").value, detalhe:document.getElementById("fDetalhe").value,
+    servFech:document.getElementById("fServFech").value,
+    entregaPrev:document.getElementById("fEntregaPrev").value,
+    entregaReal:document.getElementById("fEntregaReal").value,
+    retAgend:document.getElementById("fRetAgend").value,
+    retConf:document.getElementById("fRetConf").value,
+    retData:document.getElementById("fRetData").value,
+    retObs:document.getElementById("fRetObs").value,
+    parcelas:coletarParcelas(),
+  };
+  if(editId){
+    await updateDoc(doc(db,"leads",editId), {...dados, atualizadoEm:serverTimestamp()});
+    toast("Lead atualizado!");
+  } else {
+    dados.criadoEm = serverTimestamp();
+    await addDoc(leadsCol, dados);
+    toast("Lead salvo com sucesso!");
+  }
+  fecharModal();
+};
+
+// ── EXPORTAR CSV ──────────────────────────────────────────
+window.exportarCSV = () => {
+  const ls = getFilt();
+  const header = ["Nome","Telefone","Tipo","Produto","Temp","Status","Orçamento","Recebido","A Receber","Responsável","Mês Ref","Entrega Prevista","Tecido","Cor"];
+  const rows   = ls.map(l=>[l.nome,l.tel,l.tipo,l.prod,l.temp,l.status,l.valOrc,totRec(l),aRec(l),l.resp,l.mesRef,l.entregaPrev,l.tecido,l.cor]);
+  const csv    = [header,...rows].map(r=>r.map(c=>`"${(c||"").toString().replace(/"/g,'""')}"`).join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href     = URL.createObjectURL(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}));
+  a.download = `CRM_CasaCelio_${mesFiltro||"Geral"}.csv`;
+  a.click(); toast("CSV exportado!");
+};
+
+// ── TOAST ──────────────────────────────────────────────────
+window.toast = msg => {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2800);
+};
+
+// Fechar modais clicando fora
+document.getElementById("modalBg").addEventListener("click", e=>{ if(e.target===document.getElementById("modalBg")) fecharModal(); });
+document.getElementById("modalConfigBg").addEventListener("click", e=>{ if(e.target===document.getElementById("modalConfigBg")) fecharConfigs(); });
+
+// Enter nos campos de config
+document.getElementById("novoMembro").addEventListener("keydown", e=>{ if(e.key==="Enter") adicionarMembro(); });
+document.getElementById("novoProduto").addEventListener("keydown", e=>{ if(e.key==="Enter") adicionarProduto(); });
+</script>
+</body>
+</html>
